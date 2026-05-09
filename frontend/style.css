@@ -1,0 +1,82 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f0f4e8; /* light olive */
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Main box centered */
+.container {
+    width: 320px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* Title */
+h1 {
+    margin-bottom: 15px;
+    color: #2f3b1f;
+}
+
+/* Inputs + dropdown */
+input, select {
+    width: 90%;
+    padding: 8px;
+    margin: 6px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Button */
+button {
+    width: 95%;
+    padding: 8px;
+    margin-top: 8px;
+    background: #6b7d3a; /* olive green */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background: #5a6a31;
+}
+
+/* Task card */
+.task {
+    background: #f9faf5;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 14px;
+}
+
+/* Status colors */
+.pending {
+    border-left: 4px solid orange;
+}
+
+.completed {
+    border-left: 4px solid green;
+}
+
+/* Buttons inside task */
+.actions button {
+    width: auto;
+    padding: 5px 8px;
+    font-size: 12px;
+    margin-top: 5px;
+    background: #444;
+}
