@@ -1,29 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Task Manager Pro</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #f0f4e8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-box {
+            width: 300px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 8px 0;
+        }
+
+        button {
+            width: 95%;
+            padding: 10px;
+            background: #6b7d3a;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container">
+<div class="login-box">
+    <h2>Login</h2>
 
-    <h1>Task Manager</h1>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
 
-    <input id="title" placeholder="Task title">
-    <input id="desc" placeholder="Task description">
-
-    <select id="status">
-        <option value="pending">Pending</option>
-        <option value="completed">Completed</option>
-    </select>
-
-    <button onclick="addTask()">Add Task</button>
-
-    <div id="taskList"></div>
-
+    <button onclick="login()">Login</button>
 </div>
 
-<script src="script.js"></script>
+<script>
+const API = "https://task-manager-app-hnuy.onrender.com/api";
+
+async function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch(`${API}/auth/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.token) {
+        localStorage.setItem("token", data.token);
+
+        // ✅ GO TO TASK PAGE
+        window.location.href = "task.html";
+    } else {
+        alert(data.error || "Login failed");
+    }
+}
+</script>
+
 </body>
 </html>

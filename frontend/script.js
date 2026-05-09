@@ -1,15 +1,16 @@
-const API = "http://localhost:5000/api/tasks";
+const API = "https://task-manager-app-hnuy.onrender.com/api";
+
+// token
 const token = localStorage.getItem("token");
 
-fetch(API, {
-    headers: {
-        "Content-Type": "application/json",
-        "Authorization": token
-    }
-});
-// LOAD TASKS
+// ================= LOAD TASKS =================
 async function loadTasks() {
-    const res = await fetch(API);
+    const res = await fetch(`${API}/tasks`, {
+        headers: {
+            "Authorization": token
+        }
+    });
+
     const tasks = await res.json();
 
     const container = document.getElementById("taskList");
@@ -17,61 +18,67 @@ async function loadTasks() {
 
     tasks.forEach(task => {
         const div = document.createElement("div");
-        div.className = `task ${task.status}`;
 
         div.innerHTML = `
             <h3>${task.title}</h3>
             <p>${task.description}</p>
-            <p>Status: ${task.status}</p>
+            <p>${task.status}</p>
 
-            <div class="actions">
-                <button onclick="toggleTask('${task._id}', '${task.status}')">Toggle</button>
-                <button onclick="deleteTask('${task._id}')">Delete</button>
-            </div>
+            <button onclick="toggleTask('${task._id}', '${task.status}')">Toggle</button>
+            <button onclick="deleteTask('${task._id}')">Delete</button>
         `;
 
         container.appendChild(div);
     });
 }
 
-// ADD TASK
+// ================= ADD TASK =================
 async function addTask() {
     const title = document.getElementById("title").value;
-    const description = document.getElementById("desc").value;
+    const desc = document.getElementById("desc").value;
     const status = document.getElementById("status").value;
 
-    await fetch(API, {
+    await fetch(`${API}/tasks`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, status })
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+        },
+        body: JSON.stringify({ title, description: desc, status })
     });
-
-    document.getElementById("title").value = "";
-    document.getElementById("desc").value = "";
 
     loadTasks();
 }
 
-// DELETE
+// ================= DELETE =================
 async function deleteTask(id) {
-    await fetch(`${API}/${id}`, {
-        method: "DELETE"
+    await fetch(`${API}/tasks/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": token
+        }
     });
 
     loadTasks();
 }
 
-// TOGGLE STATUS
+// ================= TOGGLE =================
 async function toggleTask(id, currentStatus) {
     const newStatus = currentStatus === "pending" ? "completed" : "pending";
 
-    await fetch(`${API}/${id}`, {
+    await fetch(`${API}/tasks/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+        },
         body: JSON.stringify({ status: newStatus })
     });
 
     loadTasks();
 }
 
-loadTasks();
+// INIT
+if (document.getElementById("taskList")) {
+    loadTasks();
+}
