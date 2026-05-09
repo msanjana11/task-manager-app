@@ -1,10 +1,14 @@
+
+console.log("TOKEN FROM STORAGE:", localStorage.getItem("token"));
 const API = "https://task-manager-app-hnuy.onrender.com/api";
 
-// token
-const token = localStorage.getItem("token");
+/* ================= TOKEN ================= */
+function getToken() {
+    return localStorage.getItem("token");
+}
 
-// redirect if no login
-if (!token) {
+/* ================= REDIRECT IF NOT LOGGED IN ================= */
+if (!getToken()) {
     alert("Please login first");
     window.location.href = "login.html";
 }
@@ -12,9 +16,11 @@ if (!token) {
 /* ================= LOAD TASKS ================= */
 async function loadTasks() {
     try {
+        const token = getToken();
+
         const res = await fetch(`${API}/tasks`, {
             headers: {
-                "Authorization": token
+                "Authorization": `Bearer ${token}`
             }
         });
 
@@ -46,16 +52,24 @@ async function loadTasks() {
 
 /* ================= ADD TASK ================= */
 async function addTask() {
-    const title = document.getElementById("title").value;
-    const desc = document.getElementById("desc").value;
-    const status = document.getElementById("status").value;
-
     try {
+        const token = getToken();
+
+        if (!token) {
+            alert("Session expired. Please login again");
+            window.location.href = "login.html";
+            return;
+        }
+
+        const title = document.getElementById("title").value;
+        const desc = document.getElementById("desc").value;
+        const status = document.getElementById("status").value;
+
         const res = await fetch(`${API}/tasks`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": token
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
                 title,
@@ -65,17 +79,16 @@ async function addTask() {
         });
 
         const data = await res.json();
-        console.log("ADD RESPONSE:", data);
 
         if (!res.ok) {
             alert(data.error || "Add failed");
             return;
         }
 
-        loadTasks();
-
         document.getElementById("title").value = "";
         document.getElementById("desc").value = "";
+
+        loadTasks();
 
     } catch (err) {
         console.log("ADD ERROR:", err);
@@ -85,15 +98,16 @@ async function addTask() {
 /* ================= DELETE TASK ================= */
 async function deleteTask(id) {
     try {
+        const token = getToken();
+
         const res = await fetch(`${API}/tasks/${id}`, {
             method: "DELETE",
             headers: {
-                "Authorization": token
+                "Authorization": `Bearer ${token}`
             }
         });
 
         const data = await res.json();
-        console.log("DELETE RESPONSE:", data);
 
         if (!res.ok) {
             alert(data.error || "Delete failed");
@@ -109,14 +123,16 @@ async function deleteTask(id) {
 
 /* ================= TOGGLE TASK ================= */
 async function toggleTask(id, status) {
-    const newStatus = status === "pending" ? "completed" : "pending";
-
     try {
+        const token = getToken();
+
+        const newStatus = status === "pending" ? "completed" : "pending";
+
         await fetch(`${API}/tasks/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": token
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({ status: newStatus })
         });
@@ -130,3 +146,9 @@ async function toggleTask(id, status) {
 
 /* ================= INIT ================= */
 loadTasks();
+
+/* ================= MAKE FUNCTIONS GLOBAL ================= */
+window.addTask = addTask;
+window.deleteTask = deleteTask;
+window.toggleTask = toggleTask;
+window.loadTasks = loadTasks;

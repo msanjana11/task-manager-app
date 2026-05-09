@@ -1,7 +1,9 @@
+
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-require("dotenv").config();
+
 
 const taskRoutes = require("./routes/taskRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -9,7 +11,10 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 
 // 🔥 MIDDLEWARE (ORDER MATTERS)
-app.use(cors());
+app.use(cors({
+    origin: "https://task-manager-app-3hsl-lrgc3jjf9-msanjana11s-projects.vercel.app",
+    credentials: true
+}));
 app.use(express.json());
 
 // 🔐 ROUTES
@@ -27,7 +32,7 @@ mongoose.connect(process.env.MONGO_URI)
 .catch(err => console.log(err));
 
 // Server
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log("Server running on port " + PORT);
 });

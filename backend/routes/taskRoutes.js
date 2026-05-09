@@ -3,14 +3,20 @@ const express = require("express");
 const router = express.Router();
 const Task = require("../models/Task");
 
-// middleware
+// AUTH MIDDLEWARE (FIXED)
 const auth = (req, res, next) => {
-    const token = req.headers.authorization;
+    let token = req.headers.authorization;
 
-    if (!token) return res.status(401).json({ error: "No token" });
+    if (!token) {
+        return res.status(401).json({ error: "No token" });
+    }
+
+    if (token.startsWith("Bearer ")) {
+        token = token.slice(7);
+    }
 
     try {
-        const decoded = jwt.verify(token, "secretkey");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
         next();
     } catch (err) {
@@ -18,7 +24,7 @@ const auth = (req, res, next) => {
     }
 };
 
-/* ================= CREATE TASK ================= */
+// CREATE TASK
 router.post("/", auth, async (req, res) => {
     try {
         const { title, description, status } = req.body;
@@ -30,12 +36,13 @@ router.post("/", auth, async (req, res) => {
         });
 
         res.status(201).json(task);
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-/* ================= GET TASKS ================= */
+// GET TASKS
 router.get("/", auth, async (req, res) => {
     try {
         const tasks = await Task.find().sort({ createdAt: -1 });
@@ -45,7 +52,7 @@ router.get("/", auth, async (req, res) => {
     }
 });
 
-/* ================= UPDATE TASK ================= */
+// UPDATE TASK
 router.put("/:id", auth, async (req, res) => {
     try {
         const task = await Task.findByIdAndUpdate(
@@ -55,16 +62,18 @@ router.put("/:id", auth, async (req, res) => {
         );
 
         res.json(task);
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-/* ================= DELETE TASK ================= */
+// DELETE TASK
 router.delete("/:id", auth, async (req, res) => {
     try {
         await Task.findByIdAndDelete(req.params.id);
         res.json({ message: "Task deleted successfully" });
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

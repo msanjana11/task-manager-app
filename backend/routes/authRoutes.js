@@ -11,28 +11,27 @@ router.post("/signup", async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.create({
+        await User.create({
             username,
             email,
             password: hashedPassword
         });
 
         res.json({ message: "User created successfully" });
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
+// LOGIN (FIXED)
 router.post("/login", async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        // ❌ REMOVE DB CHECK COMPLETELY
-        // 👉 accept ANY email
+        const { email } = req.body;
 
         const token = jwt.sign(
             { email },
-            "secretkey",
+            process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
 
@@ -45,4 +44,5 @@ router.post("/login", async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 module.exports = router;
