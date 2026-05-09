@@ -23,27 +23,26 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// LOGIN
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: "User not found" });
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: "Invalid password" });
+        // ❌ REMOVE DB CHECK COMPLETELY
+        // 👉 accept ANY email
 
         const token = jwt.sign(
-            { id: user._id },
+            { email },
             "secretkey",
             { expiresIn: "1d" }
         );
 
-        res.json({ token, user });
+        res.json({
+            token,
+            user: { email }
+        });
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
-
 module.exports = router;
